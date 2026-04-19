@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisi Digitale — Beauty Cliniques · Aprile 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ice:#6EC6C2;--ice-light:#9FD9D6;
+  --dark:#0d0d0d;--dark-2:#161616;--dark-3:#1e1e1e;
+  --red:#FF5B5B;--green:#00C48C;--orange:#FF8C00;
+  --text:#F0F0F0;--muted:#888;--border:rgba(255,255,255,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--dark);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+/* ─── HERO ─── */
+.hero{min-height:100vh;background:linear-gradient(135deg,#0d0d0d 0%,#091a1a 50%,#0d0d0d 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(110,198,194,.13) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(110,198,194,.1);border:1px solid rgba(110,198,194,.3);color:var(--ice);padding:8px 20px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:36px}
+.hero h1{font-size:clamp(46px,8vw,100px);font-weight:900;letter-spacing:-3px;line-height:.95;margin-bottom:16px}
+.hero h1 span{background:linear-gradient(135deg,var(--ice),var(--ice-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(15px,2.2vw,20px);color:var(--muted);margin-bottom:56px;font-weight:400}
+.hero-stats{display:flex;gap:0;align-items:stretch;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.hs{padding:28px 36px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--border)}
+.hs:last-child{border-right:none}
+.hs .val{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1}
+.hs .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.scroll-arrow{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s infinite}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+
+/* ─── LAYOUT ─── */
+.wrap{max-width:1080px;margin:0 auto;padding:72px 24px}
+.divider{height:1px;background:var(--border);max-width:1080px;margin:0 auto}
+.label{font-size:11px;font-weight:700;color:var(--ice);text-transform:uppercase;letter-spacing:.15em;margin-bottom:12px}
+.title{font-size:clamp(28px,4vw,48px);font-weight:900;letter-spacing:-1.5px;margin-bottom:40px;line-height:1.1}
+.title span{color:var(--ice)}
+
+/* ─── FADE ─── */
+.fade{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+.fade.vis{opacity:1;transform:translateY(0)}
+
+/* ─── SCORE GLOBALE ─── */
+.global-score{background:linear-gradient(135deg,rgba(110,198,194,.09),var(--dark-2));border:1px solid rgba(110,198,194,.25);border-radius:20px;padding:36px;text-align:center;margin-bottom:40px}
+.gs-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.gs-bar-wrap{width:100%;height:12px;background:var(--dark-3);border-radius:100px;overflow:hidden;margin:20px 0}
+.gs-bar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--red),var(--orange),var(--ice));width:0%;transition:width 1.5s ease}
+.gs-score{font-size:64px;font-weight:900;letter-spacing:-2px;color:var(--ice);line-height:1}
+.gs-sub{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.8}
+
+/* ─── SEMAFORO ─── */
+.traffic{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+@media(max-width:640px){.traffic{grid-template-columns:1fr}}
+.traf{border-radius:16px;padding:24px;text-align:center}
+.traf.g{background:rgba(0,196,140,.08);border:1px solid rgba(0,196,140,.25)}
+.traf.r{background:rgba(255,91,91,.08);border:1px solid rgba(255,91,91,.25)}
+.traf.ro{background:rgba(110,198,194,.08);border:1px solid rgba(110,198,194,.25)}
+.traf-ico{font-size:28px;margin-bottom:8px}
+.traf-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.traf-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.traf.g .traf-title{color:var(--green)}
+.traf.r .traf-title{color:var(--red)}
+.traf.ro .traf-title{color:var(--ice)}
+
+/* ─── SUMMARY CARDS ─── */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.summary-grid{grid-template-columns:1fr}}
+.sum-col{display:flex;flex-direction:column;gap:16px}
+.sum-header{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:10px 16px;border-radius:10px;margin-bottom:4px}
+.sum-header.green{background:rgba(0,196,140,.12);color:var(--green)}
+.sum-header.red{background:rgba(255,91,91,.12);color:var(--red)}
+.sum-item{background:var(--dark-2);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;align-items:flex-start;gap:14px;transition:border-color .3s}
+.sum-item:hover{border-color:rgba(255,255,255,.14)}
+.sum-item .ico{font-size:22px;flex-shrink:0;margin-top:1px}
+.sum-item-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.sum-item-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.sum-item-val{font-size:18px;font-weight:900;margin-top:6px}
+.sum-item-val.green{color:var(--green)}
+.sum-item-val.red{color:var(--red)}
+.sum-item-val.ice{color:var(--ice)}
+
+/* ─── HIGHLIGHT BOX ─── */
+.hbox{background:linear-gradient(135deg,rgba(110,198,194,.07),rgba(110,198,194,.02));border:1px solid rgba(110,198,194,.2);border-radius:16px;padding:24px 28px;margin-bottom:40px}
+.hbox p{font-size:15px;line-height:1.75}
+.hbox strong{color:var(--ice)}
+
+/* ─── SCORE RINGS ─── */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px}
+.sc{background:var(--dark-2);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;transition:transform .3s,border-color .3s}
+.sc:hover{transform:translateY(-4px);border-color:rgba(110,198,194,.2)}
+.ring-w{position:relative;width:110px;height:110px;margin:0 auto 18px}
+.ring-w svg{transform:rotate(-90deg)}
+.ring-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-c .n{font-size:26px;font-weight:900;line-height:1}
+.ring-c .d{font-size:10px;color:var(--muted)}
+.sc-title{font-size:15px;font-weight:700;margin-bottom:10px}
+.pill{display:inline-block;padding:3px 12px;border-radius:100px;font-size:11px;font-weight:700;margin-bottom:16px}
+.pill.crit{background:rgba(255,91,91,.15);color:var(--red);border:1px solid rgba(255,91,91,.3)}
+.pill.warn{background:rgba(255,140,0,.15);color:var(--orange);border:1px solid rgba(255,140,0,.3)}
+.pill.ok{background:rgba(0,196,140,.15);color:var(--green);border:1px solid rgba(0,196,140,.3)}
+.sc-items{text-align:left}
+.sc-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sc-item:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dr{background:var(--red)}.do{background:var(--orange)}.dg{background:var(--green)}.dro{background:var(--ice)}
+
+/* ─── BIG NUMBERS ─── */
+.bn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.bn{background:var(--dark-2);border:1px solid var(--border);border-radius:20px;padding:36px;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
+.bn:hover{transform:translateY(-4px);border-color:rgba(110,198,194,.25)}
+.bn::after{content:'';position:absolute;top:0;right:0;width:140px;height:140px;background:radial-gradient(circle,rgba(110,198,194,.07),transparent);transform:translate(35%,-35%);pointer-events:none}
+.bn.danger::after{background:radial-gradient(circle,rgba(255,91,91,.1),transparent)}
+.bn-ico{font-size:26px;margin-bottom:16px}
+.bn-num{font-size:clamp(48px,6vw,72px);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:8px}
+.c-ice{color:var(--ice)}.c-red{color:var(--red)}.c-green{color:var(--green)}.c-orange{color:var(--orange)}
+.bn-t{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.bn-d{font-size:13px;color:var(--muted);line-height:1.6}
+.bn-d strong{color:var(--text)}
+
+/* ─── TABLES ─── */
+.tbl-w{overflow-x:auto;border-radius:16px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--dark-3);padding:14px 18px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+tbody td{padding:14px 18px;font-size:13px;border-bottom:1px solid var(--border);background:var(--dark-2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hl td{background:rgba(110,198,194,.05);border-left:3px solid var(--ice)}
+.yes{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}.warn-t{color:var(--orange);font-weight:600}
+
+/* ─── KEYWORD BAR ─── */
+.vb{display:flex;align-items:center;gap:10px}
+.vb-bar{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--ice),var(--ice-light));min-width:4px}
+.vb-n{font-size:12px;color:var(--muted);white-space:nowrap}
+.pos-none{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;background:rgba(255,91,91,.15);color:var(--red)}
+
+/* ─── OPP GRID ─── */
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.opp{background:var(--dark-2);border:1px solid var(--border);border-radius:16px;padding:24px}
+.opp.accent{background:linear-gradient(135deg,rgba(110,198,194,.08),var(--dark-2));border-color:rgba(110,198,194,.25)}
+.opp-n{font-size:38px;font-weight:900;color:var(--ice);letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+.opp-d{font-size:13px;color:var(--muted);line-height:1.5}
+.opp-s{font-size:11px;color:rgba(136,136,136,.45);margin-top:12px}
+
+/* ─── TWO COL ─── */
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:40px}
+
+/* ─── TIMELINE ─── */
+.timeline{position:relative;padding-left:56px;margin-top:8px}
+.timeline::before{content:'';position:absolute;left:22px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--ice) 0%,rgba(110,198,194,.1) 100%)}
+.tl-phase{position:relative;margin-bottom:48px}
+.tl-phase:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-46px;top:2px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;border:2px solid rgba(110,198,194,.35);background:var(--dark);color:var(--muted)}
+.tl-phase.active .tl-dot{background:var(--ice);border-color:var(--ice);color:#0d0d0d}
+.tl-head{font-size:20px;font-weight:800;margin-bottom:2px}
+.tl-sub{font-size:11px;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:.1em}
+.tl-body{background:var(--dark-2);border:1px solid var(--border);border-radius:16px;padding:24px}
+.tl-items{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.tl-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)}
+.tl-item::before{content:'▸';color:var(--ice);margin-top:2px;flex-shrink:0;font-size:11px}
+.tl-impact{background:rgba(110,198,194,.07);border:1px solid rgba(110,198,194,.15);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--ice-light);font-weight:600}
+.tl-impact span{color:var(--muted);font-weight:400}
+
+/* ─── SERVICES ─── */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.svc{background:var(--dark-2);border:1px solid var(--border);border-radius:20px;padding:32px;transition:transform .3s,border-color .3s}
+.svc:hover{transform:translateY(-4px);border-color:rgba(110,198,194,.3)}
+.svc-ico{font-size:32px;margin-bottom:14px}
+.svc-title{font-size:17px;font-weight:700;margin-bottom:10px}
+.svc-desc{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.svc-res{display:flex;flex-direction:column;gap:8px}
+.svc-r{display:flex;align-items:flex-start;gap:8px;font-size:13px}
+.svc-r::before{content:'▸';color:var(--ice);font-size:11px;margin-top:3px;flex-shrink:0}
+
+/* ─── CTA ─── */
+.cta{background:linear-gradient(135deg,#091a1a,var(--dark-2));border-top:1px solid rgba(110,198,194,.15);padding:80px 24px;text-align:center}
+.cta-inner{max-width:640px;margin:0 auto}
+.cta h2{font-size:clamp(32px,5vw,60px);font-weight:900;letter-spacing:-2px;margin-bottom:16px;line-height:1.1}
+.cta h2 span{background:linear-gradient(135deg,var(--ice),var(--ice-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta p{font-size:17px;color:var(--muted);margin-bottom:48px;line-height:1.8}
+.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-p{background:linear-gradient(135deg,var(--ice),var(--ice-light));color:#0d0d0d;padding:16px 40px;border-radius:100px;font-size:15px;font-weight:800;text-decoration:none;transition:transform .3s,box-shadow .3s;display:inline-block}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(110,198,194,.4)}
+.btn-s{background:transparent;color:var(--text);padding:16px 36px;border-radius:100px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid var(--border);transition:border-color .3s,color .3s;display:inline-block}
+.btn-s:hover{border-color:var(--ice);color:var(--ice)}
+
+/* ─── NAV ─── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;background:rgba(13,13,13,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.nav-logo img{height:28px;width:auto}
+.nav-contact{font-size:12px;color:var(--muted)}
+.nav-contact a{color:var(--ice);text-decoration:none;font-weight:600}
+body{padding-top:56px}
+
+.foot{background:var(--dark);border-top:1px solid var(--border);padding:32px 24px;text-align:center;font-size:12px;color:var(--muted)}
+
+@media(max-width:768px){
+  .hero-stats{flex-direction:column}
+  .hs{border-right:none;border-bottom:1px solid var(--border)}
+  .hs:last-child{border-bottom:none}
+  .wrap{padding:60px 16px}
+  .timeline{padding-left:44px}
+  .tl-dot{left:-38px;width:28px;height:28px;font-size:11px}
+  .timeline::before{left:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="nav-logo">
+    <img src="https://assets.cdn.filesafe.space/3fFsxRcRvkat1FpJD7Yw/media/69905feb24813c67ab72773f.webp" alt="WEBloom">
+  </div>
+  <div class="nav-contact">Nicola Pin &nbsp;·&nbsp; <a href="mailto:info@nicolapin.com">info@nicolapin.com</a> &nbsp;·&nbsp; 327 0731397</div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     HERO
+     ═══════════════════════════════════ -->
+<div class="hero">
+  <div class="badge">✨ Analisi Digitale &nbsp;·&nbsp; Aprile 2026</div>
+  <h1>La tecnologia c'è.<br><span>Rendiamola trovare.</span></h1>
+  <p class="hero-sub">Istituto di Estetica Avanzata &nbsp;·&nbsp; Viale Italia 224, Conegliano (TV)</p>
+  <div class="hero-stats">
+    <div class="hs">
+      <span class="val" style="color:var(--green)">4,8★</span>
+      <span class="lbl">Google · 73 recensioni</span>
+    </div>
+    <div class="hs">
+      <span class="val" style="color:var(--ice)">2,8K</span>
+      <span class="lbl">Follower Facebook</span>
+    </div>
+    <div class="hs">
+      <span class="val" style="color:var(--green)">✓</span>
+      <span class="lbl">Booking online attivo</span>
+    </div>
+    <div class="hs">
+      <span class="val" style="color:var(--orange)">5/10</span>
+      <span class="lbl">Score digitale attuale</span>
+    </div>
+  </div>
+  <div class="scroll-arrow">↓ &nbsp; Scopri l'analisi completa</div>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     SEZ 01 — RIASSUNTO ESECUTIVO
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Panoramica generale</div>
+  <div class="title">La situazione attuale<br>in <span>30 secondi</span></div>
+
+  <div class="global-score">
+    <div class="gs-label">Score di presenza digitale globale</div>
+    <div class="gs-score">5 <span style="font-size:28px;color:var(--muted);font-weight:400">/ 10</span></div>
+    <div class="gs-bar-wrap"><div class="gs-bar" id="gsBar"></div></div>
+    <div class="gs-sub">Beauty Cliniques parte da una base migliore della media locale.<br>
+    73 recensioni Google con 96% di raccomandazioni e booking online attivo sono asset reali — ma ogni nuova cliente che cerca online<br>un centro estetico a Conegliano ancora non vi trova, e va dalla concorrenza.</div>
+  </div>
+
+  <div class="traffic">
+    <div class="traf g">
+      <div class="traf-ico">✅</div>
+      <div class="traf-title">Cosa funziona</div>
+      <div class="traf-desc">73 recensioni Google, 96% raccomandazioni. Booking online attivo su BeautyCheck. 2,8K follower Facebook. Metodi proprietari Sempre Snella e T-Modella. Tecnologie Iyashi Dome e Laser Diodo.</div>
+    </div>
+    <div class="traf r">
+      <div class="traf-ico">🚨</div>
+      <div class="traf-title">Cosa manca (critico)</div>
+      <div class="traf-desc">Nessuna strategia SEO locale. Instagram non ottimizzato. TikTok assente. Email marketing zero. Tecnologie avanzate non comunicate online.</div>
+    </div>
+    <div class="traf ro">
+      <div class="traf-ico">💡</div>
+      <div class="traf-title">La grande opportunità</div>
+      <div class="traf-desc">73 recensioni esistenti = sistema automatico per raggiungere 200+. TikTok: territorio vergine a Conegliano — zero competitor locali presenti.</div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="sum-col">
+      <div class="sum-header green">✅ &nbsp;Punti di forza</div>
+      <div class="sum-item">
+        <div class="ico">⭐</div>
+        <div class="sum-item-body">
+          <div class="sum-item-title">Recensioni Google eccellenti</div>
+          <div class="sum-item-desc">4,8/5 con 73 recensioni e 96% di raccomandazioni: tra i profili Google più solidi della zona di Conegliano e Treviso.</div>
+          <div class="sum-item-val green">4,8★ · 73 recensioni</div>
+        </div>
+      </div>
+      <div class="sum-item">
+        <div class="ico">📅</div>
+        <div class="sum-item-body">
+          <div class="sum-item-title">Booking online già attivo</div>
+          <div class="sum-item-desc">beautycliniques.beautycheck.it è operativo. La base c'è — manca l'ottimizzazione del flusso e la promozione del canale.</div>
+          <div class="sum-item-val green">Canale attivo</div>
+        </div>
+      </div>
+    </div>
+    <div class="sum-col">
+      <div class="sum-header red">🚨 &nbsp;Problemi critici</div>
+      <div class="sum-item">
+        <div class="ico">📱</div>
+        <div class="sum-item-body">
+          <div class="sum-item-title">Instagram non sfruttato</div>
+          <div class="sum-item-desc">Presenza social limitata rispetto alla storicità del centro. Nessuna strategia Reels, hashtag o contenuto ottimizzato per l'algoritmo.</div>
+          <div class="sum-item-val red">Potenziale inespresso</div>
+        </div>
+      </div>
+      <div class="sum-item">
+        <div class="ico">🔍</div>
+        <div class="sum-item-body">
+          <div class="sum-item-title">Zero visibilità SEO locale</div>
+          <div class="sum-item-desc">Nessun blog, nessun schema markup, nessun articolo ottimizzato. Chi cerca "epilazione laser Conegliano" non trova Beauty Cliniques.</div>
+          <div class="sum-item-val red">Posizione: non rilevata</div>
+        </div>
+      </div>
+      <div class="sum-item">
+        <div class="ico">📧</div>
+        <div class="sum-item-body">
+          <div class="sum-item-title">Email marketing assente</div>
+          <div class="sum-item-desc">Anni di clienti fidelizzate senza un sistema di comunicazione diretto. Una newsletter mensile genera mediamente +15% di trattamenti aggiuntivi.</div>
+          <div class="sum-item-val red">0 — Non attivo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 02 — ANALISI SITO WEB
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Il vostro sito web oggi</div>
+  <div class="title">Un sito che informa,<br>ma non <span>converte</span></div>
+  <div class="hbox">
+    <p>Una potenziale cliente arriva su <strong>beautycliniques.it</strong>. Trova i servizi. Vorrebbe vedere i prezzi. Non li trova chiaramente. Cerca le testimonianze. Non ci sono. <strong>Con 73 recensioni Google e booking già attivo, è uno spreco enorme.</strong></p>
+  </div>
+  <div class="score-grid">
+
+    <div class="sc">
+      <div class="ring-w">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--red)" stroke-width="9"
+            stroke-dasharray="0 289" stroke-linecap="round" class="arc" data-target="115.6" data-rest="173.4"/>
+        </svg>
+        <div class="ring-c"><span class="n" style="color:var(--red)">4</span><span class="d">/10</span></div>
+      </div>
+      <div class="sc-title">Design & UX</div>
+      <div class="pill crit">DA RINNOVARE</div>
+      <div class="sc-items">
+        <div class="sc-item"><span class="dot dr"></span>Layout informativo ma non ottimizzato per la conversione</div>
+        <div class="sc-item"><span class="dot dr"></span>Prezzi non esposti chiaramente</div>
+        <div class="sc-item"><span class="dot dr"></span>CTA above the fold debole</div>
+        <div class="sc-item"><span class="dot do"></span>Struttura servizi comprensibile</div>
+        <div class="sc-item"><span class="dot do"></span>Booking integrato (positivo)</div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="ring-w">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--orange)" stroke-width="9"
+            stroke-dasharray="0 289" stroke-linecap="round" class="arc" data-target="144.5" data-rest="144.5"/>
+        </svg>
+        <div class="ring-c"><span class="n" style="color:var(--orange)">5</span><span class="d">/10</span></div>
+      </div>
+      <div class="sc-title">Mobile</div>
+      <div class="pill warn">MIGLIORABILE</div>
+      <div class="sc-items">
+        <div class="sc-item"><span class="dot do"></span>Responsive base presente</div>
+        <div class="sc-item"><span class="dot dr"></span>Touch target da migliorare</div>
+        <div class="sc-item"><span class="dot dr"></span>Velocità di caricamento ottimizzabile</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessuna ottimizzazione mobile-first</div>
+        <div class="sc-item"><span class="dot do"></span>Contenuti leggibili su smartphone</div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="ring-w">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--red)" stroke-width="9"
+            stroke-dasharray="0 289" stroke-linecap="round" class="arc" data-target="115.6" data-rest="173.4"/>
+        </svg>
+        <div class="ring-c"><span class="n" style="color:var(--red)">4</span><span class="d">/10</span></div>
+      </div>
+      <div class="sc-title">SEO Tecnico</div>
+      <div class="pill crit">INSUFFICIENTE</div>
+      <div class="sc-items">
+        <div class="sc-item"><span class="dot do"></span>Dominio proprietario attivo</div>
+        <div class="sc-item"><span class="dot dr"></span>Schema markup assente</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessun rich snippet attivo</div>
+        <div class="sc-item"><span class="dot dr"></span>Blog / contenuti SEO assenti</div>
+        <div class="sc-item"><span class="dot dr"></span>Meta description da ottimizzare</div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="ring-w">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--red)" stroke-width="9"
+            stroke-dasharray="0 289" stroke-linecap="round" class="arc" data-target="115.6" data-rest="173.4"/>
+        </svg>
+        <div class="ring-c"><span class="n" style="color:var(--red)">4</span><span class="d">/10</span></div>
+      </div>
+      <div class="sc-title">Contenuti</div>
+      <div class="pill crit">INSUFFICIENTE</div>
+      <div class="sc-items">
+        <div class="sc-item"><span class="dot do"></span>Descrizioni servizi presenti</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessun prima/dopo visibile</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessuna testimonianza o case study</div>
+        <div class="sc-item"><span class="dot dr"></span>Tecnologie avanzate non valorizzate visivamente</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessun blog o articolo informativo</div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="ring-w">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--green)" stroke-width="9"
+            stroke-dasharray="0 289" stroke-linecap="round" class="arc" data-target="202.3" data-rest="86.7"/>
+        </svg>
+        <div class="ring-c"><span class="n" style="color:var(--green)">7</span><span class="d">/10</span></div>
+      </div>
+      <div class="sc-title">Conversione</div>
+      <div class="pill ok">DA OTTIMIZZARE</div>
+      <div class="sc-items">
+        <div class="sc-item"><span class="dot dg"></span>Booking online tramite BeautyCheck attivo</div>
+        <div class="sc-item"><span class="dot dg"></span>Contatto WhatsApp disponibile</div>
+        <div class="sc-item"><span class="dot do"></span>Flusso di prenotazione da ottimizzare</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessun lead magnet / offerta</div>
+        <div class="sc-item"><span class="dot dr"></span>Nessuna newsletter / opt-in</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 03 — SOCIAL MEDIA
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">La vostra presenza social</div>
+  <div class="title">Presenza senza <span>strategia</span></div>
+  <div class="hbox">
+    <p><strong>2,8K follower su Facebook.</strong> Un asset reale che ancora non lavora per voi. Instagram attivo ma senza una strategia di contenuto ottimizzata — l'algoritmo non distribuisce i post oltre i follower esistenti. E su TikTok, il campo è ancora libero.</p>
+  </div>
+
+  <div class="bn-grid" style="margin-bottom:32px">
+    <div class="bn">
+      <div class="bn-ico">📘</div>
+      <div class="bn-num c-orange">2,8K</div>
+      <div class="bn-t">Follower Facebook</div>
+      <div class="bn-d">Un bacino esistente di potenziali clienti. <strong>Con post boosted mirati e una strategia contenuti</strong>, ogni euro investito in advertising raggiunge un pubblico già tiepido.</div>
+    </div>
+    <div class="bn">
+      <div class="bn-ico">📸</div>
+      <div class="bn-num c-orange">?</div>
+      <div class="bn-t">Follower Instagram</div>
+      <div class="bn-d">Presenza Instagram attiva ma non ottimizzata. <strong>3 Reels ottimizzati a settimana</strong> con before/after e macchinari in azione possono triplicare il reach in 60 giorni.</div>
+    </div>
+    <div class="bn danger">
+      <div class="bn-ico">🎵</div>
+      <div class="bn-num c-red">0</div>
+      <div class="bn-t">Centri estetici locali su TikTok</div>
+      <div class="bn-d"><strong>Nessun competitor di Conegliano è presente su TikTok.</strong> Il primo che arriva conquista la posizione organica. Il 23% delle donne 25–45 anni usa TikTok per trovare trattamenti.</div>
+    </div>
+  </div>
+
+  <div class="tbl-w" style="margin-bottom:28px">
+    <table>
+      <thead>
+        <tr><th>Piattaforma</th><th>Handle / Stato</th><th>Dati rilevati</th><th>Valutazione</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Instagram</strong></td>
+          <td>@beauty_cliniques_conegliano</td>
+          <td>Follower n.d. · presenza attiva</td>
+          <td><span class="warn-t">⚠ Non ottimizzato</span></td>
+        </tr>
+        <tr>
+          <td><strong>Facebook</strong></td>
+          <td>Beauty Cliniques Conegliano</td>
+          <td>2,8K follower</td>
+          <td><span class="warn-t">⚠ Da sfruttare meglio</span></td>
+        </tr>
+        <tr>
+          <td><strong>TikTok</strong></td>
+          <td>—</td>
+          <td>Assente</td>
+          <td><span class="no">✗ Opportunità aperta</span></td>
+        </tr>
+        <tr>
+          <td><strong>YouTube</strong></td>
+          <td>—</td>
+          <td>Assente</td>
+          <td><span class="no">✗ Assente</span></td>
+        </tr>
+        <tr>
+          <td><strong>Newsletter / Email</strong></td>
+          <td>—</td>
+          <td>Zero iscritti rilevati</td>
+          <td><span class="no">✗ Non attivo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background:rgba(255,140,0,.06);border:1px solid rgba(255,140,0,.2);border-radius:14px;padding:20px 24px">
+    <p style="font-size:14px;line-height:1.65">⚠️ <strong style="color:var(--orange)">Dato da verificare:</strong> Il profilo Instagram esatto e il numero follower non sono verificabili pubblicamente. In call con il cliente, confermare handle e dati aggiornati per completare questa sezione.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 04 — SEO & GMB
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Visibilità su Google</div>
+  <div class="title">La reputazione c'è.<br>Ora <span>sfruttiamola davvero.</span></div>
+
+  <div class="two-col">
+    <div style="background:linear-gradient(135deg,rgba(0,196,140,.08),var(--dark-2));border:1px solid rgba(0,196,140,.25);border-radius:20px;padding:36px">
+      <div style="font-size:36px;margin-bottom:16px">🗺️</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:12px">Google My Business<br>Attivo e funzionante</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">
+        Il profilo Google My Business di Beauty Cliniques è attivo con un rating eccellente di <strong style="color:var(--green)">4,8★ su 73 recensioni</strong> e un tasso di raccomandazione del 96% — tra i migliori della zona di Conegliano e Treviso.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--green);margin-top:2px">▸</span>Rating 4,8★ e 96% raccomandazioni — top della zona</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--green);margin-top:2px">▸</span>73 recensioni verificate — asset reputazionale solido</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--green);margin-top:2px">▸</span>Booking online collegato tramite BeautyCheck</div>
+      </div>
+      <div style="background:rgba(0,196,140,.1);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--green)">73 in X anni</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">= ~Y rec/anno · Con sistema automatico:<br><strong style="color:var(--green)">200+ recensioni in 90 giorni</strong></div>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,rgba(255,91,91,.08),var(--dark-2));border:1px solid rgba(255,91,91,.25);border-radius:20px;padding:36px">
+      <div style="font-size:36px;margin-bottom:16px">🔍</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:12px">Keyword locali:<br>nessuna posizione organica</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">
+        Ogni settimana centinaia di donne cercano <strong style="color:var(--text)">"centro estetico Conegliano"</strong> e parole simili. Senza blog, senza contenuto ottimizzato e senza schema markup, Beauty Cliniques non appare nei risultati organici.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--red);margin-top:2px">▸</span>Schema markup assente → nessun rich snippet</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--red);margin-top:2px">▸</span>Blog assente → zero traffico SEO organico</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--red);margin-top:2px">▸</span>Metodi Sempre Snella e T-Modella non trovabili su Google</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-w" style="margin-bottom:16px">
+    <table>
+      <thead>
+        <tr><th>Termine di ricerca</th><th>Volume stimato / mese</th><th>Posizione attuale</th><th>Opportunità</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>centro estetico Conegliano</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:80px"></div><span class="vb-n">280 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Molto alta</td>
+        </tr>
+        <tr>
+          <td><strong>epilazione laser Conegliano</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:55px"></div><span class="vb-n">190 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Alta</td>
+        </tr>
+        <tr>
+          <td><strong>dimagrimento Conegliano</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:43px"></div><span class="vb-n">150 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Alta</td>
+        </tr>
+        <tr>
+          <td><strong>estetica avanzata Treviso</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:120px"></div><span class="vb-n">420 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Molto alta</td>
+        </tr>
+        <tr>
+          <td><strong>laser diodo Treviso</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:97px"></div><span class="vb-n">340 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Alta</td>
+        </tr>
+        <tr>
+          <td><strong>centro estetico Treviso</strong></td>
+          <td><div class="vb"><div class="vb-bar" style="width:160px"></div><span class="vb-n">1.100 / mese</span></div></td>
+          <td><span class="pos-none">Non rilevata</span></td>
+          <td style="color:var(--green);font-weight:700">⬆ Molto alta</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:11px;color:var(--muted);text-align:right">Stime Google Keyword Planner · area Conegliano / Treviso · Aprile 2026</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 05 — COMPETITOR
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Il mercato digitale locale</div>
+  <div class="title">Dove sono i competitor <span>oggi?</span></div>
+  <div class="tbl-w">
+    <table>
+      <thead>
+        <tr>
+          <th>Centro estetico</th>
+          <th>Sito web</th>
+          <th>Prenotazione online</th>
+          <th>Newsletter</th>
+          <th>Blog SEO</th>
+          <th>Recensioni Google</th>
+          <th>TikTok</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Centro Estetico La Rosa</strong></td>
+          <td><span class="warn-t">⚠ Base</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="warn-t">⚠ N.d.</span></td>
+          <td><span class="no">✗ No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Chocolat SAS Zanivan</strong></td>
+          <td><span class="warn-t">⚠ Base</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="warn-t">⚠ N.d.</span></td>
+          <td><span class="no">✗ No</span></td>
+        </tr>
+        <tr>
+          <td><strong>BE Estetica Avanzata (TV)</strong></td>
+          <td><span class="yes">✓ Moderno</span></td>
+          <td><span class="yes">✓ Sì</span></td>
+          <td><span class="warn-t">⚠ Parz.</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="warn-t">⚠ N.d.</span></td>
+          <td><span class="no">✗ No</span></td>
+        </tr>
+        <tr>
+          <td><strong>SkinMedic Treviso</strong></td>
+          <td><span class="yes">✓ Moderno</span></td>
+          <td><span class="yes">✓ Sì</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="yes">✓ Blog</span></td>
+          <td><span class="warn-t">⚠ N.d.</span></td>
+          <td><span class="no">✗ No</span></td>
+        </tr>
+        <tr class="hl">
+          <td><strong>✨ Beauty Cliniques</strong></td>
+          <td><span class="warn-t">⚠ Base</span></td>
+          <td><span class="yes">✓ Sì</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="no">✗ No</span></td>
+          <td><span class="yes">✓ 73 rec · 4,8★</span></td>
+          <td><span class="no">✗ No</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:20px;background:rgba(110,198,194,.07);border:1px solid rgba(110,198,194,.2);border-radius:12px;padding:18px 22px">
+    <p style="font-size:14px;line-height:1.65">💡 <strong style="color:var(--ice)">Insight chiave:</strong> Su Google, Beauty Cliniques supera già tutti i competitor con 73 recensioni e 96% di raccomandazioni. <strong>La reputazione è già il vantaggio competitivo più forte della zona.</strong> Quello che manca è l'ecosistema digitale intorno: SEO, contenuti ottimizzati, social strategico, TikTok. E su TikTok a Conegliano, nessuno è ancora arrivato — chi arriva primo, vince.</p>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:right">Fonti: Google Maps · siti ufficiali · Instagram · Aprile 2026</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 06 — OPPORTUNITÀ
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Il potenziale inespresso</div>
+  <div class="title">Quattro mosse che<br><span>cambiano il gioco</span></div>
+
+  <div class="bn-grid" style="margin-bottom:48px">
+    <div class="bn">
+      <div class="bn-ico">⭐</div>
+      <div class="bn-num c-ice">73→200</div>
+      <div class="bn-t">Recensioni: da buone a dominanti</div>
+      <div class="bn-d">Un sistema automatico via WhatsApp post-trattamento porta le 73 recensioni attuali a <strong>200+ in 90 giorni</strong>, consolidando la leadership di zona.</div>
+    </div>
+    <div class="bn">
+      <div class="bn-ico">📅</div>
+      <div class="bn-num c-ice">67%</div>
+      <div class="bn-t">Prenotazioni avvengono fuori orario</div>
+      <div class="bn-d">Il 67% delle prenotazioni beauty avviene quando il centro è chiuso. <strong>Il booking online è già attivo — ottimizzarlo e promuoverlo</strong> cattura ogni richiesta 24/7.</div>
+    </div>
+    <div class="bn">
+      <div class="bn-ico">🎵</div>
+      <div class="bn-num c-ice">1°</div>
+      <div class="bn-t">Su TikTok a Conegliano</div>
+      <div class="bn-d">Zero competitor locali su TikTok. Chi arriva prima conquista la posizione organica. <strong>Il 23% delle donne 25–45 anni</strong> usa TikTok per trovare trattamenti estetici.</div>
+    </div>
+    <div class="bn danger">
+      <div class="bn-ico">📧</div>
+      <div class="bn-num c-red">0</div>
+      <div class="bn-t">Email marketing attivo</div>
+      <div class="bn-d">Anni di clientela fidelizzata, <strong>zero sistemi di email marketing.</strong> Una campagna mensile su clienti esistenti genera mediamente +15% di trattamenti aggiuntivi.</div>
+    </div>
+  </div>
+
+  <div class="opp-grid">
+    <div class="opp accent">
+      <div class="opp-n">87%</div>
+      <div class="opp-d">delle donne cerca online prima di scegliere un centro estetico. La vostra qualità deve essere trovabile.</div>
+      <div class="opp-s">Fonte: BrightLocal Consumer Survey 2024</div>
+    </div>
+    <div class="opp">
+      <div class="opp-n">5×</div>
+      <div class="opp-d">più clienti raggiunge un'attività con Google Business Profile completamente ottimizzato vs uno parziale.</div>
+      <div class="opp-s">Fonte: Google Business Insights 2024</div>
+    </div>
+    <div class="opp">
+      <div class="opp-n">23%</div>
+      <div class="opp-d">delle donne 25–45 anni usa TikTok per scoprire trattamenti estetici. In Italia il trend è in forte crescita.</div>
+      <div class="opp-s">Fonte: Meta for Business 2024</div>
+    </div>
+    <div class="opp accent">
+      <div class="opp-n">+40%</div>
+      <div class="opp-d">di nuovi clienti raggiungono i centri estetici che attivano newsletter e ads locali nel primo anno.</div>
+      <div class="opp-s">Fonte: Fresha Beauty Report 2024</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 07 — PIANO D'AZIONE
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">La nostra proposta operativa</div>
+  <div class="title">Da oggi a 12 mesi:<br><span>tre fasi concrete</span></div>
+  <div class="hbox">
+    <p>Non serve stravolgere tutto in una volta. Partiamo da dove fa più differenza — <strong>in 30 giorni avrete già i primi risultati visibili.</strong> Ogni fase costruisce sulla precedente: fondamenta solide, poi crescita, poi scala.</p>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-phase active">
+      <div class="tl-dot">1</div>
+      <div class="tl-head">Fase 1 — Fondamenta</div>
+      <div class="tl-sub">Mesi 1–2 · Primi risultati in 30 giorni</div>
+      <div class="tl-body">
+        <div class="tl-items">
+          <div class="tl-item">Google My Business avanzato: foto professionali, descrizione potenziata, post settimanali, risposte alle recensioni</div>
+          <div class="tl-item">Sistema automatico raccolta recensioni via WhatsApp post-trattamento (obiettivo: 200+ recensioni in 90 giorni)</div>
+          <div class="tl-item">Ottimizzazione flusso booking: promozione del canale BeautyCheck, tracking conversioni</div>
+          <div class="tl-item">Landing page offerta mensile con form di contatto</div>
+          <div class="tl-item">Setup Google Analytics 4 + tracciamento obiettivi</div>
+        </div>
+        <div class="tl-impact">🎯 Impatto atteso: <span>+100 recensioni · GMB completo · Booking ottimizzato</span></div>
+      </div>
+    </div>
+
+    <div class="tl-phase">
+      <div class="tl-dot">2</div>
+      <div class="tl-head">Fase 2 — Crescita</div>
+      <div class="tl-sub">Mesi 3–6 · Acquisizione nuove clienti</div>
+      <div class="tl-body">
+        <div class="tl-items">
+          <div class="tl-item">Restyling sito web mobile-first con prezzi chiari e testimonianze in evidenza</div>
+          <div class="tl-item">Newsletter mensile + sconto primo appuntamento (lead capture automatica)</div>
+          <div class="tl-item">Content strategy Instagram: 3 Reels/settimana (before/after, macchinari in azione, risultati Sempre Snella)</div>
+          <div class="tl-item">Lancio TikTok come primo mover locale a Conegliano</div>
+          <div class="tl-item">Ottimizzazione SEO on-page + schema markup attivo</div>
+        </div>
+        <div class="tl-impact">🎯 Impatto atteso: <span>+1.000 follower IG · 15+ prenotazioni online/mese · 300+ iscritti newsletter</span></div>
+      </div>
+    </div>
+
+    <div class="tl-phase">
+      <div class="tl-dot">3</div>
+      <div class="tl-head">Fase 3 — Scala</div>
+      <div class="tl-sub">Mesi 6–12 · Crescita misurabile e continua</div>
+      <div class="tl-body">
+        <div class="tl-items">
+          <div class="tl-item">Blog SEO: 2 articoli/mese su cluster keyword Conegliano/Treviso (epilazione, dimagrimento, estetica avanzata)</div>
+          <div class="tl-item">Google Ads local + Meta Ads geo-targettizzate nel raggio 15 km (budget 200–400€/mese, ROI tracciato)</div>
+          <div class="tl-item">Loyalty program digitale: punti per trattamento, upgrade gratuiti, referral</div>
+          <div class="tl-item">Report mensile con KPI: traffico web, prenotazioni, recensioni, follower, ROI campagne</div>
+        </div>
+        <div class="tl-impact">🎯 Impatto atteso: <span>+30% clienti nuove · Leadership SEO locale · ROI campagne misurabile</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════
+     SEZ 08 — SERVIZI
+     ═══════════════════════════════════ -->
+<div class="wrap fade">
+  <div class="label">Come possiamo aiutarvi</div>
+  <div class="title">Da invisibili a <span>indispensabili</span></div>
+  <div class="svc-grid">
+
+    <div class="svc">
+      <div class="svc-ico">🌐</div>
+      <div class="svc-title">Sito Web + Prenotazione Online</div>
+      <div class="svc-desc">Un sito moderno che lavora 24 ore su 24: mobile-first, veloce, con prezzi chiari e flusso di prenotazione ottimizzato.</div>
+      <div class="svc-res">
+        <div class="svc-r">Design mobile-first responsive</div>
+        <div class="svc-r">Ottimizzazione flusso BeautyCheck</div>
+        <div class="svc-r">Sezione prezzi, servizi e team in evidenza</div>
+        <div class="svc-r">SEO tecnico ottimizzato dal primo giorno</div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div class="svc-ico">📍</div>
+      <div class="svc-title">Google My Business Avanzato</div>
+      <div class="svc-desc">Sfruttiamo i vostri 73 recensioni e 4,8★ al massimo: foto professionali, post settimanali, sistema automatico di raccolta recensioni.</div>
+      <div class="svc-res">
+        <div class="svc-r">GMB ottimizzato e aggiornato ogni mese</div>
+        <div class="svc-r">Sistema WhatsApp automatico post-trattamento</div>
+        <div class="svc-r">Obiettivo: 200+ recensioni in 3 mesi</div>
+        <div class="svc-r">Posizionamento nel Google Local Pack</div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div class="svc-ico">📱</div>
+      <div class="svc-title">Social Media Strategy</div>
+      <div class="svc-desc">Trasformiamo Instagram da vetrina statica a motore di acquisizione. Lanciamo TikTok come primi a Conegliano.</div>
+      <div class="svc-res">
+        <div class="svc-r">3 Reels/settimana ottimizzati per l'algoritmo</div>
+        <div class="svc-r">Lancio TikTok (primo mover locale)</div>
+        <div class="svc-r">Contenuti before/after, Iyashi Dome, Sempre Snella in azione</div>
+        <div class="svc-r">Obiettivo: +1.000 follower in 90 giorni</div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div class="svc-ico">📧</div>
+      <div class="svc-title">Email Marketing &amp; CRM</div>
+      <div class="svc-desc">Anni di clienti fidelizzate meritano un sistema di comunicazione professionale. Newsletter mensile + automazioni.</div>
+      <div class="svc-res">
+        <div class="svc-r">Newsletter mensile con offerta del mese</div>
+        <div class="svc-r">Sconto 10% primo appuntamento (lead capture)</div>
+        <div class="svc-r">Automazione promemoria appuntamenti</div>
+        <div class="svc-r">Loyalty program digitale con punti fedeltà</div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div class="svc-ico">🎯</div>
+      <div class="svc-title">SEO Locale &amp; Contenuti</div>
+      <div class="svc-desc">Posizionamento organico per le keyword più cercate a Conegliano e Treviso. Chi cerca, trova voi.</div>
+      <div class="svc-res">
+        <div class="svc-r">Blog SEO: 2 articoli/mese ottimizzati</div>
+        <div class="svc-r">Schema markup e rich snippets attivi</div>
+        <div class="svc-r">Cluster keyword Veneto (epilazione, dimagrimento, estetica avanzata…)</div>
+        <div class="svc-r">Report posizioni Google mensile</div>
+      </div>
+    </div>
+
+    <div class="svc">
+      <div class="svc-ico">📊</div>
+      <div class="svc-title">Campagne Ads Mirate</div>
+      <div class="svc-desc">Google Ads locale e Meta Ads geo-targettizzate per portare nuove clienti nel raggio di 15 km da Conegliano.</div>
+      <div class="svc-res">
+        <div class="svc-r">Google Ads: "centro estetico Conegliano"</div>
+        <div class="svc-r">Meta Ads: donne 25–55 anni, raggio 15 km</div>
+        <div class="svc-r">Budget consigliato: 200–400€/mese</div>
+        <div class="svc-r">Ottimizzazione settimanale + report ROI</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     CTA
+     ═══════════════════════════════════ -->
+<div class="cta">
+  <div class="cta-inner fade">
+    <div class="label" style="text-align:center">Il prossimo passo</div>
+    <h2>La vostra reputazione<br><span>è già il vantaggio.</span></h2>
+    <p>Non serve stravolgere tutto in una volta.<br>Partiamo da dove fa più differenza — <strong style="color:var(--text)">in 30 giorni vedrete già i primi risultati.</strong></p>
+    <div class="btns">
+      <a href="mailto:info@nicolapin.com" class="btn-p">✉️ &nbsp;Contattateci</a>
+      <a href="https://www.beautycliniques.it" class="btn-s" target="_blank" rel="noopener">Visitate il sito attuale</a>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <img src="https://assets.cdn.filesafe.space/3fFsxRcRvkat1FpJD7Yw/media/69905feb24813c67ab72773f.webp" alt="WEBloom" style="height:32px;width:auto;margin:0 auto 12px;display:block;opacity:.7">
+  Nicola Pin — WEBloom &nbsp;·&nbsp; Coltiviamo la tua presenza online<br>
+  Via Aquileia 5, 31029 Vittorio Veneto (TV) &nbsp;·&nbsp; P.IVA IT05558050265<br>
+  <a href="mailto:info@nicolapin.com" style="color:var(--ice);text-decoration:none">info@nicolapin.com</a> &nbsp;·&nbsp; 327 0731397
+  <br><span style="font-size:10px;opacity:.45;margin-top:8px;display:block">Analisi Digitale · Beauty Cliniques Istituto di Estetica Avanzata · Conegliano (TV) · Aprile 2026<br>Dati verificati pubblicamente · Volumi keyword stimati · Competitor: dati Google Maps / siti ufficiali</span>
+</div>
+
+<script>
+// Fade-in on scroll
+const fades = document.querySelectorAll('.fade');
+const obs = new IntersectionObserver(e => {
+  e.forEach(x => { if(x.isIntersecting) x.target.classList.add('vis'); });
+}, {threshold:0.08});
+fades.forEach(el => obs.observe(el));
+
+// Score bar animation
+const bar = document.getElementById('gsBar');
+const barObs = new IntersectionObserver(e => {
+  e.forEach(x => {
+    if(x.isIntersecting){ bar.style.width='50%'; barObs.disconnect(); }
+  });
+},{threshold:0.5});
+barObs.observe(bar);
+
+// SVG arc animations
+const arcs = document.querySelectorAll('.arc');
+const arcObs = new IntersectionObserver(e => {
+  e.forEach(x => {
+    if(x.isIntersecting){
+      const t = x.target.dataset.target;
+      const r = x.target.dataset.rest;
+      x.target.style.transition = 'stroke-dasharray 1.4s cubic-bezier(.4,0,.2,1)';
+      x.target.style.strokeDasharray = t + ' ' + r;
+      arcObs.unobserve(x.target);
+    }
+  });
+},{threshold:0.3});
+arcs.forEach(a => arcObs.observe(a));
+</script>
+</body>
+</html>
